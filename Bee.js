@@ -70,6 +70,110 @@
      */
     _.reverse = function (string) {
         return string.split('').reverse().join('');
+    };
+
+    _.getURLParam = function (name) {
+        return (window.location.href.match(new RegExp(`${name}=(\\w+)`)) || [])[1] || '';
+    };
+
+    /**
+     * 移动端初始化rem
+     */
+    _.initRem = function () {
+        var doc = document.documentElement;
+        var psd = 375;
+        var dpr = 1;
+        var scale = 1 / dpr;
+        var resize = 'orientationchange' in window ? 'orientationchange' : 'resize';
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, user-scalable=no, initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale;
+
+        doc.appendChild(meta);
+
+        function recalc() {
+            var width = doc.clientWidth;
+
+            if (width / dpr > psd) {
+                width = psd * dpr;
+            }
+            doc.dataset.width = width;
+            doc.dataset.persent = 100 * (width / psd);
+            doc.style.fontSize = 100 * (width / psd) + 'px';
+        }
+
+        recalc();
+
+        if (document.addEventListener) {
+            window.addEventListener(resize, recalc, false);
+        }
+
+    }
+
+    _.getLocalTime = function (date) {
+        let Y = date.getFullYear();
+        let M = date.getMonth() + 1;
+        let D = date.getDate();
+        let h = date.getHours();
+        let m = date.getMinutes();
+        return Y + '-' + (M < 10 ? '0' + M : M) + '-' + (D < 10 ? '0' + D : D) + ' ' + (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ':00';
+    }
+    
+    _.toString = function (val) {
+        return val == null ?
+        '' :
+        typeof val === 'object' ?
+        JSON.stringify(val, null, 2) :
+        String(val)
+    }
+
+    _.isObject = function (obj) {
+        return obj !== null && typeof obj === 'object'
+    }
+
+    _.isRegExp = function (v) {
+        return _toString.call(v) === '[object RegExp]'
+    }
+
+    _.isPlainObject = function (obj) {
+        return _toString.call(obj) === '[object Object]'
+    }
+
+    /**
+     * Check if two values are loosely equal - that is,
+     * if they are plain objects, do they have the same shape?
+     */
+    _.looseEqual = function (a, b) {
+        if (a === b) return true
+        const isObjectA = isObject(a)
+        const isObjectB = isObject(b)
+        if (isObjectA && isObjectB) {
+            try {
+                const isArrayA = Array.isArray(a)
+                const isArrayB = Array.isArray(b)
+                if (isArrayA && isArrayB) {
+                    return a.length === b.length && a.every((e, i) => {
+                        return looseEqual(e, b[i])
+                    })
+                } else if (!isArrayA && !isArrayB) {
+                    const keysA = Object.keys(a)
+                    const keysB = Object.keys(b)
+                    return keysA.length === keysB.length && keysA.every(key => {
+                        return looseEqual(a[key], b[key])
+                    })
+                } else {
+                    /* istanbul ignore next */
+                    return false
+                }
+            } catch (e) {
+                /* istanbul ignore next */
+                return false
+            }
+        } else if (!isObjectA && !isObjectB) {
+            return String(a) === String(b)
+        } else {
+            return false
+        }
     }
 
     _.mixin = function (obj) {
