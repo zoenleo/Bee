@@ -58,6 +58,10 @@
   _.isFunction = function(obj) {
     return typeof obj == "function" || false
   }
+  
+  _.isObject = function(obj) {
+    return obj.toString() === '[object Object]' || false
+  }
 
   _.functions = function(obj) {
     var names = []
